@@ -185,7 +185,11 @@ class CartController extends APIController
 
         Cart::collectTotals();
 
-        $cartResource = (new CartResource(Cart::getCart()))->jsonSerialize();
+        $cart = Cart::getCart();
+        if (!$cart->shipping_address) $cart->setRelation('shipping_address', $address);
+        if (!$cart->billing_address) $cart->setRelation('billing_address', $address);
+
+        $cartResource = (new CartResource($cart))->jsonSerialize();
 
         return new JsonResource([
             'data'     => [
